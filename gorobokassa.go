@@ -20,7 +20,7 @@ const (
 	QUERY_LOGIN       = "MrchLogin"
 	ROBOKASSA_HOST    = "auth.robokassa.ru"
 	ROBOKASSA_PATH    = "Merchant/Index.aspx"
-	PROTO             = "https"
+	SCHEME            = "https"
 	DELIMETER         = ":"
 )
 
@@ -64,7 +64,7 @@ func buildRedirectUrl(login, password string, invoice, value int, description st
 
 	q := url.URL{}
 	q.Host = ROBOKASSA_HOST
-	q.Scheme = PROTO
+	q.Scheme = SCHEME
 	q.Path = ROBOKASSA_PATH
 
 	params := url.Values{}
