@@ -36,7 +36,6 @@ func TestUrlGeneration(t *testing.T) {
 	})
 
 	Convey("Client", t, func() {
-
 		c := New("login", "pwd1", "password")
 		Convey("Url", func() {
 			in, err := c.Url(110, 2000, "description")
