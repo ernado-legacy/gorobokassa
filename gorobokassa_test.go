@@ -10,7 +10,7 @@ import (
 
 func TestUrlGeneration(t *testing.T) {
 	Convey("Url", t, func() {
-		in := buildRedirectUrl("lel", "lel", 11, 500, "KEK")
+		in := buildRedirectURL("lel", "lel", 11, 500, "KEK")
 		out := "https://auth.robokassa.ru/Merchant/Index.aspx?Desc=KEK&InvId=11&MrchLogin=lel&OutSum=500&SignatureValue=e8c1c7bcacfa991b8612f2759804abd9"
 		So(in, ShouldEqual, out)
 	})
