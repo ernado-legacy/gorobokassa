@@ -43,7 +43,7 @@ func TestUrlGeneration(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(in, ShouldEqual, out)
 		})
-		Convey("Check", func() {
+		Convey("CheckResult", func() {
 			request := &http.Request{}
 			q := url.URL{}
 			params := url.Values{}
@@ -52,7 +52,7 @@ func TestUrlGeneration(t *testing.T) {
 			params.Add("SignatureValue", "3a3869287aaa475dda04d93280705839")
 			q.RawQuery = params.Encode()
 			request.URL = &q
-			So(c.Check(request), ShouldBeTrue)
+			So(c.CheckResult(request), ShouldBeTrue)
 		})
 
 	})

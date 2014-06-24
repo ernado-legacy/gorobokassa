@@ -34,12 +34,19 @@ type Client struct {
 	secondPassword string
 }
 
+// формирование URL переадресации пользователя на оплату
 func (client *Client) Url(invoice, value int, description string) (string, error) {
 	return buildRedirectUrl(client.login, client.firstPassword, invoice, value, description)
 }
 
-func (client *Client) Check(r *http.Request) bool {
+// получение уведомления об исполнении операции (ResultURL)
+func (client *Client) CheckResult(r *http.Request) bool {
 	return verifyRequest(client.secondPassword, r)
+}
+
+// проверка параметров в скрипте завершения операции (SuccessURL)
+func (client *Client) CheckSuccess(r *http.Request) bool {
+	return verifyRequest(client.firstPassword, r)
 }
 
 func New(login, password1, password2 string) *Client {
@@ -92,6 +99,7 @@ func verifyRequest(password string, r *http.Request) bool {
 	}
 	invoice, err := strconv.Atoi(q.Get(QUERY_INV_ID))
 	if err != nil {
+		log.Println(err)
 		return false
 	}
 	crc := q.Get(QUERY_CRC)
