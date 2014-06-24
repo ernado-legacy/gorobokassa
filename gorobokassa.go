@@ -2,7 +2,6 @@ package gorobokassa
 
 import (
 	"crypto/md5"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -22,10 +21,6 @@ const (
 	ROBOKASSA_PATH    = "Merchant/Index.aspx"
 	SCHEME            = "https"
 	DELIMETER         = ":"
-)
-
-var (
-	ErrIncorrectValue = errors.New("incorrect value")
 )
 
 type Client struct {
