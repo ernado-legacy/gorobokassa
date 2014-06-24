@@ -54,6 +54,16 @@ func TestUrlGeneration(t *testing.T) {
 			request.URL = &q
 			So(c.CheckResult(request), ShouldBeTrue)
 		})
-
+		Convey("CheckSuccess", func() {
+			request := &http.Request{}
+			q := url.URL{}
+			params := url.Values{}
+			params.Add("OutSum", "1200")
+			params.Add("InvId", "666")
+			params.Add("SignatureValue", "1bc5c075a999e194e6d46ba351e4c11e")
+			q.RawQuery = params.Encode()
+			request.URL = &q
+			So(c.CheckSuccess(request), ShouldBeTrue)
+		})
 	})
 }
