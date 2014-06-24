@@ -35,7 +35,7 @@ type Client struct {
 }
 
 // формирование URL переадресации пользователя на оплату
-func (client *Client) Url(invoice, value int, description string) (string, error) {
+func (client *Client) Url(invoice, value int, description string) string {
 	return buildRedirectUrl(client.login, client.firstPassword, invoice, value, description)
 }
 
@@ -64,11 +64,7 @@ func CRC(v ...interface{}) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func buildRedirectUrl(login, password string, invoice, value int, description string) (string, error) {
-	if value < 0 {
-		return "", ErrIncorrectValue
-	}
-
+func buildRedirectUrl(login, password string, invoice, value int, description string) string {
 	q := url.URL{}
 	q.Host = ROBOKASSA_HOST
 	q.Scheme = SCHEME
@@ -82,8 +78,7 @@ func buildRedirectUrl(login, password string, invoice, value int, description st
 	params.Add(QUERY_CRC, CRC(login, value, invoice, password))
 
 	q.RawQuery = params.Encode()
-
-	return q.String(), nil
+	return q.String()
 }
 
 func verifyResult(password string, invoice, value int, crc string) bool {

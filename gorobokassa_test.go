@@ -10,14 +10,9 @@ import (
 
 func TestUrlGeneration(t *testing.T) {
 	Convey("Url", t, func() {
-		in, err := buildRedirectUrl("lel", "lel", 11, 500, "KEK")
+		in := buildRedirectUrl("lel", "lel", 11, 500, "KEK")
 		out := "https://auth.robokassa.ru/Merchant/Index.aspx?Desc=KEK&InvId=11&MrchLogin=lel&OutSum=500&SignatureValue=e8c1c7bcacfa991b8612f2759804abd9"
-		So(err, ShouldBeNil)
 		So(in, ShouldEqual, out)
-		Convey("Less than zero", func() {
-			_, err := buildRedirectUrl("d", "s", 11, -200, "test")
-			So(err, ShouldNotBeNil)
-		})
 	})
 	Convey("Result", t, func() {
 		request := &http.Request{}
@@ -38,9 +33,8 @@ func TestUrlGeneration(t *testing.T) {
 	Convey("Client", t, func() {
 		c := New("login", "pwd1", "password")
 		Convey("Url", func() {
-			in, err := c.Url(110, 2000, "description")
+			in := c.Url(110, 2000, "description")
 			out := "https://auth.robokassa.ru/Merchant/Index.aspx?Desc=description&InvId=110&MrchLogin=login&OutSum=2000&SignatureValue=1364f38f54e76a0affe62974bfdbde85"
-			So(err, ShouldBeNil)
 			So(in, ShouldEqual, out)
 		})
 		Convey("CheckResult", func() {
@@ -64,6 +58,30 @@ func TestUrlGeneration(t *testing.T) {
 			q.RawQuery = params.Encode()
 			request.URL = &q
 			So(c.CheckSuccess(request), ShouldBeTrue)
+		})
+		Convey("NotNumber", func() {
+			Convey("InvId", func() {
+				request := &http.Request{}
+				q := url.URL{}
+				params := url.Values{}
+				params.Add("OutSum", "1200")
+				params.Add("InvId", "a666")
+				params.Add("SignatureValue", CRC(1200, "a666", c.firstPassword))
+				q.RawQuery = params.Encode()
+				request.URL = &q
+				So(c.CheckSuccess(request), ShouldBeFalse)
+			})
+			Convey("OutSum", func() {
+				request := &http.Request{}
+				q := url.URL{}
+				params := url.Values{}
+				params.Add("OutSum", "12b00")
+				params.Add("InvId", "666")
+				params.Add("SignatureValue", CRC("12b00", "666", c.firstPassword))
+				q.RawQuery = params.Encode()
+				request.URL = &q
+				So(c.CheckSuccess(request), ShouldBeFalse)
+			})
 		})
 	})
 }
