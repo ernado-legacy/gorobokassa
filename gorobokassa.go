@@ -12,65 +12,67 @@ import (
 )
 
 const (
-	QUERY_OUT_SUMM    = "OutSum"
-	QUERY_INV_ID      = "InvId"
-	QUERY_CRC         = "SignatureValue"
-	QUERY_DESCRIPTION = "Desc"
-	QUERY_LOGIN       = "MrchLogin"
-	ROBOKASSA_HOST    = "auth.robokassa.ru"
-	ROBOKASSA_PATH    = "Merchant/Index.aspx"
-	SCHEME            = "https"
-	DELIMETER         = ":"
+	queryOutSumm     = "OutSum"
+	queryInvID       = "InvId"
+	queryCRC         = "SignatureValue"
+	queryDescription = "Desc"
+	queryLogin       = "MrchLogin"
+	robokassaHost    = "auth.robokassa.ru"
+	robokassaPath    = "Merchant/Index.aspx"
+	scheme           = "https"
+	delim            = ":"
 )
 
+// Client для генерации URL и проверки уведомлений
 type Client struct {
 	login          string
 	firstPassword  string
 	secondPassword string
 }
 
-// формирование URL переадресации пользователя на оплату
-func (client *Client) Url(invoice, value int, description string) string {
-	return buildRedirectUrl(client.login, client.firstPassword, invoice, value, description)
+// URL переадресации пользователя на оплату
+func (client *Client) URL(invoice, value int, description string) string {
+	return buildRedirectURL(client.login, client.firstPassword, invoice, value, description)
 }
 
-// получение уведомления об исполнении операции (ResultURL)
+// CheckResult получение уведомления об исполнении операции (ResultURL)
 func (client *Client) CheckResult(r *http.Request) bool {
 	return verifyRequest(client.secondPassword, r)
 }
 
-// проверка параметров в скрипте завершения операции (SuccessURL)
+// CheckSuccess проверка параметров в скрипте завершения операции (SuccessURL)
 func (client *Client) CheckSuccess(r *http.Request) bool {
 	return verifyRequest(client.firstPassword, r)
 }
 
+// New Client
 func New(login, password1, password2 string) *Client {
 	return &Client{login, password1, password2}
 }
 
-// join values with delimeter and return hex of md5
+// CRC of joint values with delimeter
 func CRC(v ...interface{}) string {
 	s := make([]string, len(v))
 	for key, value := range v {
 		s[key] = fmt.Sprintf("%v", value)
 	}
 	h := md5.New()
-	io.WriteString(h, strings.Join(s, DELIMETER))
+	io.WriteString(h, strings.Join(s, delim))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func buildRedirectUrl(login, password string, invoice, value int, description string) string {
+func buildRedirectURL(login, password string, invoice, value int, description string) string {
 	q := url.URL{}
-	q.Host = ROBOKASSA_HOST
-	q.Scheme = SCHEME
-	q.Path = ROBOKASSA_PATH
+	q.Host = robokassaHost
+	q.Scheme = scheme
+	q.Path = robokassaPath
 
 	params := url.Values{}
-	params.Add(QUERY_LOGIN, login)
-	params.Add(QUERY_OUT_SUMM, strconv.Itoa(value))
-	params.Add(QUERY_INV_ID, strconv.Itoa(invoice))
-	params.Add(QUERY_DESCRIPTION, description)
-	params.Add(QUERY_CRC, CRC(login, value, invoice, password))
+	params.Add(queryLogin, login)
+	params.Add(queryOutSumm, strconv.Itoa(value))
+	params.Add(queryInvID, strconv.Itoa(invoice))
+	params.Add(queryDescription, description)
+	params.Add(queryCRC, CRC(login, value, invoice, password))
 
 	q.RawQuery = params.Encode()
 	return q.String()
@@ -82,16 +84,16 @@ func verifyResult(password string, invoice, value int, crc string) bool {
 
 func verifyRequest(password string, r *http.Request) bool {
 	q := r.URL.Query()
-	value, err := strconv.Atoi(q.Get(QUERY_OUT_SUMM))
+	value, err := strconv.Atoi(q.Get(queryOutSumm))
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	invoice, err := strconv.Atoi(q.Get(QUERY_INV_ID))
+	invoice, err := strconv.Atoi(q.Get(queryInvID))
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	crc := q.Get(QUERY_CRC)
+	crc := q.Get(queryCRC)
 	return verifyResult(password, invoice, value, crc)
 }

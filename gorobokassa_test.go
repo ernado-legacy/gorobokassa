@@ -33,7 +33,7 @@ func TestUrlGeneration(t *testing.T) {
 	Convey("Client", t, func() {
 		c := New("login", "pwd1", "password")
 		Convey("Url", func() {
-			in := c.Url(110, 2000, "description")
+			in := c.URL(110, 2000, "description")
 			out := "https://auth.robokassa.ru/Merchant/Index.aspx?Desc=description&InvId=110&MrchLogin=login&OutSum=2000&SignatureValue=1364f38f54e76a0affe62974bfdbde85"
 			So(in, ShouldEqual, out)
 		})
