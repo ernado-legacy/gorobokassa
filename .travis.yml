@@ -7,4 +7,5 @@ go:
 
 script:
  - go get .
+ - go get github.com/smartystreets/goconvey/convey
  - go test -v ./...
