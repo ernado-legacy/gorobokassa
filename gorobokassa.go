@@ -2,6 +2,7 @@ package gorobokassa
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -23,6 +24,10 @@ const (
 	delim            = ":"
 )
 
+var (
+	ErrBadRequest = errors.New("bad request")
+)
+
 // Client для генерации URL и проверки уведомлений
 type Client struct {
 	login          string
@@ -38,6 +43,10 @@ func (client *Client) URL(invoice, value int, description string) string {
 // CheckResult получение уведомления об исполнении операции (ResultURL)
 func (client *Client) CheckResult(r *http.Request) bool {
 	return verifyRequest(client.secondPassword, r)
+}
+
+func (client *Client) ResultInvoice(r *http.Request) (int, int, error) {
+	return getInvoice(client.secondPassword, r)
 }
 
 // CheckSuccess проверка параметров в скрипте завершения операции (SuccessURL)
@@ -82,18 +91,26 @@ func verifyResult(password string, invoice, value int, crc string) bool {
 	return strings.ToUpper(crc) == strings.ToUpper(CRC(value, invoice, password))
 }
 
-func verifyRequest(password string, r *http.Request) bool {
+func getInvoice(password string, r *http.Request) (int, int, error) {
 	q := r.URL.Query()
 	value, err := strconv.Atoi(q.Get(queryOutSumm))
 	if err != nil {
 		log.Println(err)
-		return false
+		return 0, 0, ErrBadRequest
 	}
 	invoice, err := strconv.Atoi(q.Get(queryInvID))
 	if err != nil {
 		log.Println(err)
-		return false
+		return 0, 0, ErrBadRequest
 	}
 	crc := q.Get(queryCRC)
-	return verifyResult(password, invoice, value, crc)
+	if !verifyResult(password, invoice, value, crc) {
+		return 0, 0, ErrBadRequest
+	}
+	return invoice, value, nil
+}
+
+func verifyRequest(password string, r *http.Request) bool {
+	_, _, err := getInvoice(password, r)
+	return err == nil
 }
