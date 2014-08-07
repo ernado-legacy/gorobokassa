@@ -18,10 +18,13 @@ const (
 	queryCRC         = "SignatureValue"
 	queryDescription = "Desc"
 	queryLogin       = "MrchLogin"
-	robokassaHost    = "auth.robokassa.ru"
-	robokassaPath    = "Merchant/Index.aspx"
-	scheme           = "https"
-	delim            = ":"
+	// robokassaHost    = "auth.robokassa.ru"
+	robokassaHost = "test.robokassa.ru"
+	//robokassaPath = "Merchant/Index.aspx"
+	robokassaPath = "Index.aspx"
+	// scheme        = "https"
+	scheme = "http"
+	delim  = ":"
 )
 
 var (
@@ -88,6 +91,7 @@ func buildRedirectURL(login, password string, invoice, value int, description st
 }
 
 func verifyResult(password string, invoice, value int, crc string) bool {
+	log.Println(crc, CRC(value, invoice, password), value, invoice, password)
 	return strings.ToUpper(crc) == strings.ToUpper(CRC(value, invoice, password))
 }
 
@@ -105,6 +109,7 @@ func getInvoice(password string, r *http.Request) (int, int, error) {
 	}
 	crc := q.Get(queryCRC)
 	if !verifyResult(password, invoice, value, crc) {
+		log.Println("result not verified")
 		return 0, 0, ErrBadRequest
 	}
 	return invoice, value, nil
