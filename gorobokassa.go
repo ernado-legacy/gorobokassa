@@ -18,13 +18,13 @@ const (
 	queryCRC         = "SignatureValue"
 	queryDescription = "Desc"
 	queryLogin       = "MrchLogin"
-	// robokassaHost    = "auth.robokassa.ru"
-	robokassaHost = "test.robokassa.ru"
-	//robokassaPath = "Merchant/Index.aspx"
+	robokassaHost    = "auth.robokassa.ru"
+	// robokassaHost = "test.robokassa.ru"
+	robokassaPath = "Merchant/Index.aspx"
 	robokassaPath = "Index.aspx"
-	// scheme        = "https"
-	scheme = "http"
-	delim  = ":"
+	scheme        = "https"
+	// scheme        = "http"
+	delim = ":"
 )
 
 var (
