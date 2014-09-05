@@ -21,8 +21,8 @@ const (
 	robokassaHost    = "auth.robokassa.ru"
 	// robokassaHost = "test.robokassa.ru"
 	robokassaPath = "Merchant/Index.aspx"
-	robokassaPath = "Index.aspx"
-	scheme        = "https"
+	// robokassaPath = "Index.aspx"
+	scheme = "https"
 	// scheme        = "http"
 	delim = ":"
 )
