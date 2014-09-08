@@ -97,11 +97,12 @@ func verifyResult(password string, invoice, value int, crc string) bool {
 
 func getInvoice(password string, r *http.Request) (int, int, error) {
 	q := r.URL.Query()
-	value, err := strconv.Atoi(q.Get(queryOutSumm))
+	fvalue, err := strconv.ParseFloat(q.Get(queryOutSumm), 32)
 	if err != nil {
 		log.Println(err)
 		return 0, 0, ErrBadRequest
 	}
+	value := int(fvalue)
 	invoice, err := strconv.Atoi(q.Get(queryInvID))
 	if err != nil {
 		log.Println(err)
