@@ -18,14 +18,14 @@ func TestUrlGeneration(t *testing.T) {
 		request := &http.Request{}
 		q := url.URL{}
 		params := url.Values{}
-		params.Add("OutSum", "1200")
+		params.Add("OutSum", "30.000000")
 		params.Add("InvId", "666")
-		params.Add("SignatureValue", "3a3869287aaa475dda04d93280705839")
+		params.Add("SignatureValue", "096684ec7388dcfe48ba1a3b5d2c6565")
 		q.RawQuery = params.Encode()
 		request.URL = &q
 		log.Println(q.String())
-		So(verifyResult("password", 666, 1200, "3a3869287aaa475dda04d93280705839"), ShouldBeTrue)
-		So(verifyResult("password", 666, 1200, "3a3869287aaa475dda04e93280705839"), ShouldBeFalse)
+		So(verifyResult("password", 666, "30.000000", "096684ec7388dcfe48ba1a3b5d2c6565"), ShouldBeTrue)
+		So(verifyResult("password", 666, "32.000000", "096684ec7388dcfe48ba1a3b5d2c6565"), ShouldBeFalse)
 		So(verifyRequest("password", request), ShouldBeTrue)
 		So(verifyRequest("test", request), ShouldBeFalse)
 	})

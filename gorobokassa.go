@@ -90,7 +90,7 @@ func buildRedirectURL(login, password string, invoice, value int, description st
 	return q.String()
 }
 
-func verifyResult(password string, invoice, value int, crc string) bool {
+func verifyResult(password string, invoice int, value string, crc string) bool {
 	log.Println(crc, CRC(value, invoice, password), value, invoice, password)
 	return strings.ToUpper(crc) == strings.ToUpper(CRC(value, invoice, password))
 }
@@ -109,7 +109,7 @@ func getInvoice(password string, r *http.Request) (int, int, error) {
 		return 0, 0, ErrBadRequest
 	}
 	crc := q.Get(queryCRC)
-	if !verifyResult(password, invoice, value, crc) {
+	if !verifyResult(password, invoice, q.Get(queryOutSumm), crc) {
 		log.Println("result not verified")
 		return 0, 0, ErrBadRequest
 	}
